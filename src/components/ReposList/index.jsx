@@ -1,29 +1,49 @@
 import { useEffect, useState } from "react";
 
-const ReposList = () => {
+import styles from './ReposList.module.css';
+
+const ReposList = ({nomeUsuario}) => {
     const [repos, setRepos] = useState([]);
+    const [estaCarregando, setEstaCarregando] = useState(true);
 
     useEffect(() =>{
-        fetch('https://api.github.com/users/BrayanFranklin8/repos')
+        setEstaCarregando(true)
+        fetch(`https://api.github.com/users/${nomeUsuario}/repos`)
         .then(res => res.json())
         .then(resJson =>{
-            setRepos(resJson)
+            setTimeout(()=>{
+                setEstaCarregando(false)
+                setRepos(resJson)
+            },3000)
+            
         })
-    },[]);
+    },[nomeUsuario]);
 
 
     return(
-        <ul>
-            {repos.map(respositorio =>(
-                <li key={respositorio.id}>
-                    <b>Nome: {respositorio.name}</b>
-                    <b>Linguagem: {respositorio.language}</b>
-                    <a target="_blank" href={respositorio.html_url}>Visitar no GitHub</a>
+        <div className='container'>
+            {estaCarregando ?(
+            <h1>Carregando...</h1>
+            ) : (
 
-                </li>
-            ))}
-            <li>Repositorio</li>
-        </ul>
+                <ul className={styles.list}>
+                {repos.map(respositorio =>(
+                    <li className={styles.listItem} key={respositorio.id}>
+                        <div className={styles.itemName}>
+                            <b>Nome:</b>
+                            {respositorio.name}
+                        </div>
+
+                        <div className={styles.itemLanguage}>
+                        <b>Linguagem:</b>
+                        {respositorio.language}
+                        </div>
+                        <a className={styles.itemLink} target="_blank" href={respositorio.html_url}>Visitar no GitHub</a>
+                    </li>
+                ))}
+            </ul>
+            )}
+        </div>
     )
 }
 
